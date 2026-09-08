@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// One row per user/tenant (kept minimal - extend when you wire real Google OAuth)
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+
+  senders      Sender[]
+  slackConfig  SlackConfig?
+}
+
+// A "sender" identity used to send emails (Ethereal accounts here, but the
+// model supports multiple senders per user like the assignment asks for)
+model Sender {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  label     String // e.g. "Sales Sender 1"
+  smtpUser  String
+  smtpPass  String
+  createdAt DateTime @default(now())
+
+  emails EmailJob[]
+}
+
+model SlackConfig {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  accessToken String
+  webhookUrl  String?
+  channelId   String?
+  createdAt   DateTime @default(now())
+}
+
+enum EmailStatus {
+  SCHEDULED
+  SENT
+  FAILED
+  DELAYED_RATE_LIMIT
+}
+
+// The source of truth for every email. BullMQ jobs reference rows here by id -
+// the DB row is what makes state survive a restart, the BullMQ job is just
+// "when to wake up and check this row".
+model EmailJob {
+  id            String      @id @default(uuid())
+  senderId      String
+  sender        Sender      @relation(fields: [senderId], references: [id])
+  recipient     String
+  subject       String
+  body          String
+  scheduledFor  DateTime
+  status        EmailStatus @default(SCHEDULED)
+  bullJobId     String? // the BullMQ job id tied to this row (idempotency key)
+  attempts      Int         @default(0)
+  errorMessage  String?
+  sentAt        DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([status])
+  @@index([senderId, status])
+}
