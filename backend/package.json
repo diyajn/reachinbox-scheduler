@@ -14,8 +14,8 @@
     "prisma:migrate": "prisma migrate dev --name init"
   },
   "dependencies": {
-    "@bull-board/api": "^5.21.0",
-    "@bull-board/express": "^5.21.0",
+    "@bull-board/api": "^9.9.0",
+    "@bull-board/express": "^9.9.0",
     "@prisma/client": "^5.18.0",
     "bullmq": "^5.12.0",
     "cors": "^2.8.5",
