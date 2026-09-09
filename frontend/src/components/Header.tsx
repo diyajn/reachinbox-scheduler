@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { fetchMe, logout, Me } from "@/lib/auth";
+import { fetchMe, logout, Me, fetchSlackStatus, slackConnectUrl } from "@/lib/auth";
 
 const PUBLIC_PATHS = ["/login", "/auth/callback"];
 
@@ -12,6 +12,7 @@ export default function Header() {
   const router = useRouter();
   const [user, setUser] = useState<Me | null>(null);
   const [checked, setChecked] = useState(false);
+  const [slackConnected, setSlackConnected] = useState(false);
 
   useEffect(() => {
     fetchMe().then((me) => {
@@ -19,6 +20,8 @@ export default function Header() {
       setChecked(true);
       if (!me && !PUBLIC_PATHS.includes(pathname)) {
         router.replace("/login");
+      } else if (me) {
+        fetchSlackStatus().then(setSlackConnected);
       }
     });
   }, [pathname, router]);
@@ -33,6 +36,18 @@ export default function Header() {
       </Link>
       {user && (
         <div className="flex items-center gap-3">
+          {slackConnected ? (
+            <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+              Slack connected
+            </span>
+          ) : (
+            <a
+              href={slackConnectUrl()}
+              className="rounded-lg border px-3 py-1 text-xs font-medium hover:bg-gray-50"
+            >
+              Connect Slack
+            </a>
+          )}
           {user.avatarUrl && (
             <img src={user.avatarUrl} className="h-8 w-8 rounded-full" alt="" />
           )}

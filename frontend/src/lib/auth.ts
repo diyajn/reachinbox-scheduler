@@ -36,3 +36,19 @@ export async function fetchMe(): Promise<Me | null> {
   if (!res.ok) return null;
   return res.json();
 }
+
+export function slackConnectUrl(): string {
+  const token = getToken();
+  return `${API_BASE}/auth/slack?token=${token}`;
+}
+
+export async function fetchSlackStatus(): Promise<boolean> {
+  const token = getToken();
+  if (!token) return false;
+  const res = await fetch(`${API_BASE}/auth/slack/status`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return false;
+  const data = await res.json();
+  return !!data.connected;
+}

@@ -10,6 +10,7 @@ import { ExpressAdapter } from "@bull-board/express";
 import { emailQueue } from "./queue";
 import { emailsRouter } from "./routes/emails";
 import { authRouter } from "./routes/auth";
+import { slackAuthRouter } from "./routes/slackAuth";
 
 const app = express();
 app.use(cors());
@@ -27,6 +28,8 @@ app.use("/admin/queues", serverAdapter.getRouter());
 // ---- API routes ----
 app.use("/api/emails", emailsRouter);
 app.use("/auth", authRouter);
+app.use("/auth", slackAuthRouter);
+
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
 const PORT = Number(process.env.PORT) || 4000;
