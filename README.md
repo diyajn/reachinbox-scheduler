@@ -123,8 +123,12 @@ GET /api/emails/search?q=
 * CSV parsing is handled on the frontend using PapaParse.
 
 ## Demo
+ [**[ReachInbox Email Scheduler video]**](https://drive.google.com/drive/folders/1tjuOrdae1YUjGPB5hFcxvqbWSI_oVerh?usp=drive_link)
 
-Demo video: **[Add video link here]**
+## Live demo
+- Frontend: [https://reachinbox-scheduler.vercel.app](https://reachinbox-scheduler-beta-green.vercel.app/)
+- Backend API: https://reachinbox-scheduler-production-34cc.up.railway.app
+- BullMQ dashboard: [https://reachinbox-scheduler-production-34cc.up.railway.app/admin/queues](https://reachinbox-scheduler-production-34cc.up.railway.app/admin/queues)
 
 
 
