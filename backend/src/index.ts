@@ -11,7 +11,7 @@ import { emailQueue } from "./queue";
 import { emailsRouter } from "./routes/emails";
 import { authRouter } from "./routes/auth";
 import { slackAuthRouter } from "./routes/slackAuth";
-
+import { ensureEmailIndex } from "./elasticsearch";
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -31,6 +31,13 @@ app.use("/auth", authRouter);
 app.use("/auth", slackAuthRouter);
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
+
+ensureEmailIndex().catch((err) =>
+  console.error(
+    "Failed to create Elasticsearch index (is it running?):",
+    err.message
+  )
+);
 
 const PORT = Number(process.env.PORT) || 4000;
 app.listen(PORT, () => {
